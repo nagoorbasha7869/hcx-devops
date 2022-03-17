@@ -1,0 +1,24 @@
+image:
+  tag: "{{ image_tag }}"
+  repository: "{{ docker_repo }}/hcx-api"
+env:
+  bootstrap_servers: "{{ groups['kafka'][0] }}:9092"
+  kafka_payload_topic: "{{ env }}.hcx.request.payload"
+  kafka_coverageeligibility_topic: "{{ env }}.hcx.request.coverageeligibility"
+  kafka_preauth_topic: "{{ env }}.hcx.request.preauth"
+  kafka_claim_topic: "{{ env }}.hcx.request.claim"
+  kafka_payment_topic: "{{ env }}.hcx.request.payment"
+  kafka_search_topic: "{{ env }}.hcx.request.search"
+  kafka_search_response_topic: "{{ env }}.hcx.response.search"
+  kafka_status_topic: "{{ env }}.hcx.request.status.search"
+  kafka_communication_topic: "{{ env }}.hcx.request.communication"
+  kafka_predetermination_topic: "{{ env }}.hcx.request.predetermination"
+  postgres_url: "jdbc:postgresql://{{ hcx_api_postgresql_host }}/postgres"
+  elasticsearch_url: "{{ groups['elasticsearch'][0] }}:9200"
+  postgres_user: "{{ hcx_api_postgresql_user }}"
+  postgres_password: "{{ hcx_api_postgresql_password }}"
+  postgres_tablename: "payload"
+  registry_basePath: "http://hcx-registry.{{ env }}.svc.cluster.local:8081"
+
+service:
+  type: ClusterIP
