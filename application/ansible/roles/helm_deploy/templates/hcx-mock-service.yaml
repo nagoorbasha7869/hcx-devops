@@ -1,6 +1,6 @@
 image:
   tag: "{{ image_tag }}"
-  repository: "{{ docker_repo }}/hcx-api"
+  repository: "{{ docker_repo }}/hcx-mock-service"
 env:
   bootstrap_servers: "{{ groups['kafka'][0] }}:9092"
   kafka_payload_topic: "{{ env }}.hcx.request.payload"
