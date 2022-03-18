@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "api-gateway.fullname" . }}:{{ .Values.service.port }}']
+      args: ['{{ include "hcx-mock-service.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
