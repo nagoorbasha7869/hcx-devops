@@ -55,7 +55,7 @@ deployHelm = {
     additionalVariables = additionalVariables + " " + additionalArgs
 
     sh """
-      echo ${appName}:${imageTag}
+      echo ${ap pName}:${imageTag}
       cd application/ansible
       ansible-playbook -i inventory/hosts helm.yaml -e application=$appName $additionalVariables -v
     """
