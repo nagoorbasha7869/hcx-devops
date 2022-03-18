@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "hcx_mock_service.fullname" . }}
+  name: {{ include "hcx-mock-service.fullname" . }}
   labels:
-    {{- include "hcx_mock_service.labels" . | nindent 4 }}
+    {{- include "hcx-mock-service.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "hcx_mock_service.fullname" . }}
+    name: {{ include "hcx-mock-service.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

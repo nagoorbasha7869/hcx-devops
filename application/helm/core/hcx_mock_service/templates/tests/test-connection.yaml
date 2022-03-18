@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "hcx_mock_service.fullname" . }}-test-connection"
+  name: "{{ include "hcx-mock-service.fullname" . }}-test-connection"
   labels:
-    {{- include "hcx_mock_service.labels" . | nindent 4 }}
+    {{- include "hcx-mock-service.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:

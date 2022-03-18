@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "hcx_mock_service.fullname" . }}
+  name: {{ include "hcx-mock-service.fullname" . }}
   labels:
-    {{- include "hcx_mock_service.labels" . | nindent 4 }}
+    {{- include "hcx-mock-service.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "hcx_mock_service.selectorLabels" . | nindent 6 }}
+      {{- include "hcx-mock-service.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,13 +18,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "hcx_mock_service.selectorLabels" . | nindent 8 }}
+        {{- include "hcx-mock-service.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "hcx_mock_service.serviceAccountName" . }}
+      serviceAccountName: {{ include "hcx-mock-service.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:

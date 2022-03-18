@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: rjshrjndrn/hcx_mock_service
+  repository: rjshrjndrn/hcx-mock-service
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "66c81ec_24"

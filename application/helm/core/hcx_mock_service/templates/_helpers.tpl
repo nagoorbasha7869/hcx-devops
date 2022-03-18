@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "hcx_mock_service.name" -}}
+{{- define "hcx-mock-service.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "hcx_mock_service.fullname" -}}
+{{- define "hcx-mock-service.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "hcx_mock_service.chart" -}}
+{{- define "hcx-mock-service.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "hcx_mock_service.labels" -}}
-helm.sh/chart: {{ include "hcx_mock_service.chart" . }}
-{{ include "hcx_mock_service.selectorLabels" . }}
+{{- define "hcx-mock-service.labels" -}}
+helm.sh/chart: {{ include "hcx-mock-service.chart" . }}
+{{ include "hcx-mock-service.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "hcx_mock_service.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "hcx_mock_service.name" . }}
+{{- define "hcx-mock-service.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "hcx-mock-service.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "hcx_mock_service.serviceAccountName" -}}
+{{- define "hcx-mock-service.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "hcx_mock_service.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "hcx-mock-service.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

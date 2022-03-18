@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "hcx_mock_service.fullname" . }}
+  name: {{ include "hcx-mock-service.fullname" . }}
   labels:
-    {{- include "hcx_mock_service.labels" . | nindent 4 }}
+    {{- include "hcx-mock-service.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "hcx_mock_service.selectorLabels" . | nindent 4 }}
+    {{- include "hcx-mock-service.selectorLabels" . | nindent 4 }}
