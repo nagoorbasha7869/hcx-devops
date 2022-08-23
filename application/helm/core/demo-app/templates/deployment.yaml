@@ -40,11 +40,11 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            - name: PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: demo-app
-                  key: demo_app_port
+            #            - name: PORT
+            #              valueFrom:
+            #    configMapKeyRef:
+            #      name: demo-app
+            #      key: demo_app_port
             - name: HCX_UPSTREAM
               valueFrom:
                 configMapKeyRef:
