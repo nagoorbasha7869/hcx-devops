@@ -3,11 +3,11 @@ kind: ConfigMap
 metadata:
   name: demo-app
 data:
-  hcx_upstream: "http://a851b026063934683964f22c6732f177-1969328968.ap-south-1.elb.amazonaws.com:8095/"
-  sender_code: "provider-swasth-mock-provider-dev"
-  hcx_username: "swasthmockproviderdev@gmail.com"
-  api_version: "v0.7"
-  hcx_password: "Opensaber@123"
-  demo_app_port: "8000"
-  recipient_code: "payor-swasth-mock-payor-dev"
-  token_url: "http://aef8101c432d04a659e6317b3e5031cf-1674586068.ap-south-1.elb.amazonaws.com:8080/auth/realms/swasth-health-claim-exchange/protocol/openid-connect/token"
+  hcx_upstream: {{ .Values.hcx_upstream }} 
+  sender_code: {{ .Values.sender_code }} 
+  hcx_username: {{ .Values.hcx_username }}
+  api_version: {{ .Values.api_version }}
+  hcx_password: {{ .Values.hcx_password }}
+  demo_app_port: {{ .Values.demo_app_port }}
+  recipient_code: {{ .Values.recipient_code }}
+  token_url: {{ .Values.token_url }} 
