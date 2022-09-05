@@ -5,3 +5,12 @@ image:
 service:
   type: LoadBalancer
   port: 8000
+
+hcx_upstream: '{{ hcx_upstream }}'
+sender_code: '{{ sender_code }}'
+hcx_username: '{{ hcx_username }}'
+api_version: '{{ version }}'
+hcx_password: '{{ hcx_password }}'
+demo_app_port: 8000 
+recipient_code: '{{ recipient_code }}'
+token_url: '{{ token_url }}'
