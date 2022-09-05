@@ -68,17 +68,6 @@ resources: {}
   #   memory: 128Mi
 
 
-# hcx_upstream: {{ hcx_upstream }}
-# sender_code: {{ sender_code }}
-# hcx_username: {{ hcx_username }}
-# api_version: {{ api_version }}
-# hcx_password: {{ hcx_password }}
-# demo_app_port: {{ demo_app_port }}
-# recipient_code: {{ recipient_code }}
-# token_url: {{ token_url }}
-
-
-
 
 autoscaling:
   enabled: false
