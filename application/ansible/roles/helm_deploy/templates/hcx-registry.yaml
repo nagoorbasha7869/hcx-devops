@@ -6,7 +6,7 @@ env:
   connectionInfo_uri :  "jdbc:postgresql://{{ hcx_registry_postgresql_host }}/registry"
   connectionInfo_username : "{{hcx_registry_postgresql_user}}"
   connectionInfo_password : "{{ hcx_registry_postgresql_password  }}"
-  sunbird_sso_url : http://a9dd63de91ee94d59847a1225da8b111-273954130.ap-south-1.elb.amazonaws.com:8080/auth
+  sunbird_sso_url : "{{ sunbird_sso_url }}"
   sunbird_sso_realm : swasth-health-claim-exchange
   sunbird_sso_client_id : client
   sunbird_sso_admin_client_id : admin-api
