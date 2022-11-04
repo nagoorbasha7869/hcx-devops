@@ -2,8 +2,8 @@ image:
   tag: "{{ image_tag }}"
   repository: "{{ docker_repo }}/hcx-scheduler-jobs"
 env:
-  # 3 hours time delay
-  retry_fixedDelay_in_milliseconds: "10800000"
+  # 30 minutes time delay
+  retry_fixedDelay_in_milliseconds: "1800000"
   # 1 day time delay
   participantVerify_fixedDelay_in_milliseconds: "86400000"
   registry_base_path: "http://hcx-registry.{{ env }}.svc.cluster.local:8081"
