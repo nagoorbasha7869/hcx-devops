@@ -16,7 +16,8 @@ data:
     location /grafana {
       proxy_set_header Host $http_host;
       rewrite /grafana/(.*) /$1 break;
-      proxy_pass http://monitoring-grafana.monitoring.svc.cluster.local;
+      set $target http://monitoring-grafana.monitoring.svc.cluster.local;
+      proxy_pass $target;
     }
     location /api/ {
       proxy_http_version 1.1;
@@ -24,24 +25,28 @@ data:
       rewrite /api/(.*) /$1 break;
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Host $host;
-      proxy_pass http://api-gateway.{{.Release.Namespace}}.svc.cluster.local:8095;
+      set $target http://api-gateway.{{.Release.Namespace}}.svc.cluster.local:8095;
+      proxy_pass $target;
     }
     location /auth {
       proxy_http_version 1.1;
       proxy_set_header Connection "";
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Host $host;
-      proxy_pass http://keycloak.keycloak.svc.cluster.local:8080;
+      set $target http://keycloak.keycloak.svc.cluster.local:8080;
+      proxy_pass $target;
     }
     location / {
       proxy_http_version 1.1;
       proxy_set_header Host $host;
-      proxy_pass http://superset.{{.Release.Namespace}}.svc.cluster.local:8088;
+      set $target http://superset.{{.Release.Namespace}}.svc.cluster.local:8088;
+      proxy_pass $target;
     }
     location /api/v1/ {
       proxy_http_version 1.1;
       proxy_set_header Host $host;
-      proxy_pass http://superset.{{.Release.Namespace}}.svc.cluster.local:8088;
+      set $target http://superset.{{.Release.Namespace}}.svc.cluster.local:8088;
+      proxy_pass $target;
     }
   sites.conf: |-
     # Ref: https://github.com/openresty/openresty/#resolvconf-parsing
@@ -70,4 +75,36 @@ data:
        ssl_certificate_key /etc/nginx/secrets/tls.key;
        include /etc/nginx/conf.d/location.list;
     }
+  prometheus.conf: |-
+    tcp_nodelay on;
+    lua_shared_dict prometheus_metrics 10M;
 
+    error_log stderr;
+
+    init_worker_by_lua_block {
+        prometheus = require("prometheus").init("prometheus_metrics",
+    {sync_interval=0.4})
+        metric_requests = prometheus:counter("nginx_http_requests_total",
+          "Number of HTTP requests", {"host", "status"})
+        metric_latency = prometheus:histogram("nginx_http_request_duration_seconds",
+          "HTTP request latency", {"host"})
+        metric_connections = prometheus:gauge("nginx_http_connections",
+          "Number of HTTP connections", {"state"})
+    }
+    log_by_lua_block {
+        metric_requests:inc(1, {ngx.var.server_name, ngx.var.status})
+        metric_latency:observe(tonumber(ngx.var.request_time),
+                               {ngx.var.server_name})
+    }
+
+    server {
+        listen 9145;
+        location /metrics {
+            content_by_lua_block {
+                metric_connections:set(ngx.var.connections_reading, {"reading"})
+                metric_connections:set(ngx.var.connections_waiting, {"waiting"})
+                metric_connections:set(ngx.var.connections_writing, {"writing"})
+                prometheus:collect()
+            }
+        }
+    }
