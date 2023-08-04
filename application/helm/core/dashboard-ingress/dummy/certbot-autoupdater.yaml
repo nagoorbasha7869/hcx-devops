@@ -23,31 +23,31 @@ spec:
         spec:
           serviceAccountName: certbot
           containers:
-          - name: certbot
-            image: rjshrjndrn/certbot-autoupdater
-            resources:
-              limits:
-                cpu: 100m
-                memory: 200Mi
-            ports:
-            - containerPort: 80
-            env:
-            - name: EMAIL
-              value: sadanand@sanketika.in
-            - name: DOMAIN
-              value: dev-hcx.dashboard.swasth.app
-            command:
-              - /bin/sh
-            args:
-              - /opt/renew.sh
-            volumeMounts:
-            - name: renewscript
-              mountPath: /opt/renew.sh
-              subPath: renew.sh
+            - name: certbot
+              image: rjshrjndrn/certbot-autoupdater
+              resources:
+                limits:
+                  cpu: 100m
+                  memory: 200Mi
+              ports:
+                - containerPort: 80
+              env:
+                - name: EMAIL
+                  value: sadanand@sanketika.in
+                - name: DOMAIN
+                  value: dev-hcx.dashboard.swasth.app
+              command:
+                - /bin/sh
+              args:
+                - /opt/renew.sh
+              volumeMounts:
+                - name: renewscript
+                  mountPath: /opt/renew.sh
+                  subPath: renew.sh
           volumes:
-          - name: renewscript
-            configMap:
-              name: certbot
+            - name: renewscript
+              configMap:
+                name: certbot
           restartPolicy: Never
 ---
 apiVersion: v1
@@ -64,7 +64,7 @@ data:
     }
     certbot certonly --non-interactive --agree-tos -m $EMAIL -d $DOMAIN --standalone
     catch_err $?
-    kubectl get secret hcx-ssl -o yaml > ssl.yaml
+    kubectl get secret hcx-dashboard-ssl -o yaml > ssl.yaml
     cat ssl.yaml | sed "s/ tls.crt: .*/ tls.crt: $(cat /etc/letsencrypt/live/${DOMAIN}/fullchain.pem | base64 | tr -d '\n')/g" | \
                    sed "s/ tls.key: .*/ tls.key: $(cat /etc/letsencrypt/live/${DOMAIN}/privkey.pem |  base64 | tr -d '\n')/g" > file.yaml
     catch_err $?
@@ -78,8 +78,8 @@ metadata:
   name: certbot
 spec:
   ports:
-  - port: 80
-    targetPort: 80
+    - port: 80
+      targetPort: 80
   selector:
     app: certbot
 ---
@@ -93,29 +93,29 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: certbot
 rules:
-- apiGroups:
-  - apps
-  resourceNames:
-  - dashboard-ingress
-  resources:
-  - deployments
-  verbs:
-  - get
-  - list
-  - watch
-  - patch
-- apiGroups: [""]
-  resources: ["secrets"]
-  resourceNames: ["hcx-ssl"]
-  verbs: ["*"]
+  - apiGroups:
+      - apps
+    resourceNames:
+      - dashboard-ingress
+    resources:
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["hcx-dashboard-ssl"]
+    verbs: ["*"]
 ---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: certbot
 subjects:
-- kind: ServiceAccount
-  name: certbot # Name is case sensitive
+  - kind: ServiceAccount
+    name: certbot # Name is case sensitive
 roleRef:
   kind: Role #this must be Role or ClusterRole
   name: certbot # this must match the name of the Role or ClusterRole you wish to bind to
