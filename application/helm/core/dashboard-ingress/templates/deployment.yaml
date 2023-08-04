@@ -63,7 +63,7 @@ spec:
       - name: ssl
         secret:
           defaultMode: 420
-          secretName: hcx-ssl
+          secretName: hcx-dashboard-ssl
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
