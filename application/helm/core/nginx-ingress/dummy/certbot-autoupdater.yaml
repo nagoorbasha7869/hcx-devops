@@ -24,7 +24,7 @@ spec:
           serviceAccountName: certbot
           containers:
           - name: certbot
-            image: rjshrjndrn/certbot-autoupdater
+            image: swasth2021/certbot-autoupdater
             resources:
               limits:
                 cpu: 100m
