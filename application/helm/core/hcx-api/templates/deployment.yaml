@@ -74,3 +74,8 @@ spec:
               items:
               - key: user_realm.der
                 path: user_realm_private_key.der
+          - secret:
+              name: api-access-realm
+              items:
+              - key: api_access_realm.der
+                path: api_access_realm_private_key.der

@@ -6,13 +6,13 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: dev-cluster
+  name: hcx-dev-1-27
   region: ap-south-1
-  version: "1.20"
+  version: "1.27"
 
 vpc:
   id: "vpc-0a7e986d70910cfea"
-  cidr: "10.0.0.0/16"       # (optional, must match CIDR used by the given VPC)
+  cidr: "10.0.0.0/16" # (optional, must match CIDR used by the given VPC)
   subnets:
     # must provide 'private' and/or 'public' subnets by availibility zone as shown
     private:
@@ -33,23 +33,23 @@ vpc:
 iam:
   withOIDC: true
   serviceAccounts:
-  - metadata:
-      name: cluster-autoscaler
-      namespace: kube-system
-      labels: {aws-usage: "cluster-ops"}
-    wellKnownPolicies:
-      autoScaler: true
-    roleName: eksctl-cluster-autoscaler-role
-    roleOnly: true
+    - metadata:
+        name: cluster-autoscaler
+        namespace: kube-system
+        labels: { aws-usage: "cluster-ops" }
+      wellKnownPolicies:
+        autoScaler: true
+      roleName: eksctl-cluster-autoscaler-dev-role
+      roleOnly: true
 managedNodeGroups:
   - name: managed-ng-1
     # EC2 tags required for cluster-autoscaler auto-discovery
     tags:
       k8s.io/cluster-autoscaler/enabled: "true"
       k8s.io/cluster-autoscaler/dev-cluster: "owned"
-    instanceType: t3.large
+    instanceType: t3.medium
     securityGroups:
-      attachIDs: 
+      attachIDs:
         - "sg-04607f5bbc4b9fd30"
     minSize: 1
     maxSize: 2
@@ -60,21 +60,32 @@ managedNodeGroups:
       withAddonPolicies:
         efs: true
         autoScaler: true
+        ebs: true
 fargateProfiles:
-  - name: fargate-hcx-staging-eks
+  - name: fargate-hcx-dev-eks
     selectors:
       # All workloads in the "kube-system" Kubernetes namespace will be
       # scheduled onto Fargate:
       - namespace: kube-system
-  - name: fp-staging
-    selectors:
-      # All workloads in the "cicd" Kubernetes namespace matching the following
-      # label selectors will be scheduled onto Fargate:
-      - namespace: cicd
-        labels:
-          env: cicd
-          runtime: ondemand
+    # - name: fp-hcx-dev
+    #   selectors:
+    #     # All workloads in the "cicd" Kubernetes namespace matching the following
+    #     # label selectors will be scheduled onto Fargate:
+    #     - namespace: cicd
+    #       labels:
+    #         env: cicd
+    #         runtime: ondemand
+addons:
+  - name: aws-ebs-csi-driver
+    # all below properties are optional
+    version: v1.20.0-eksbuild.1
     tags:
-      env: staging
-      name: fp-staging
-
+      env: hcx-dev
+      name: fp-hcx-dev
+  - name: vpc-cni
+    attachPolicyARNs:
+      - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+    version: v1.13.4-eksbuild.1
+    tags:
+      env: hcx-dev
+      name: fp-hcx-dev
