@@ -7,11 +7,21 @@ Download the tool from `https://github.com/weaveworks/eksctl/releases/tag/v0.72.
 To use the kubeconfig file from aws, you need aws-authenticator.
 Download the aws authenticator from `https://github.com/kubernetes-sigs/aws-iam-authenticator/releases`
 
+Update the cluste config file with details of vpc for specific environment, name of the cluster.
+Kubernetes version 1.23 onwards EBS volume driver is not natively installed and needs to be created as a separate addon.
 To Create cluster
 
 ```
-eksctl create cluster -f eks_cluster_config.yaml --profile `aws-profile-name`
+eksctl create cluster -f eks_cluster_config.yaml --profile `aws-profile-name` #use profile with eks full access or create access ex. - git-deploy
 ```
+Create a .yaml file to store the kubeconfig context, set the env KUBECONFIG variable to it.
+export KUBECONFIG="~/create-file.yaml"
+
+aws eks update-kubeconfig --name `cluster-name` --profile `aws-profile-name`
+
+try to check kubectl get operations work or not.
+
+
 
 To Enable cluster Autoscaler
 
