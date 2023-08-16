@@ -65,6 +65,96 @@ from flask_appbuilder.security.manager import AUTH_OID
 from keycloak_security_manager import OIDCSecurityManager
 import os
 from cachelib.redis import RedisCache
+from my_security_manager import CustomSecurityManager
+
+import requests
+
+user_search_url = '{{ .Values.hcx_url }}/api/{{ .Values.api_version }}/user/search'
+participant_search_url = '{{ .Values.hcx_url }}/api/{{ .Values.api_version }}/participant/search'
+token_url = '{{ .Values.hcx_url }}/api/{{ .Values.api_version }}/participant/auth/token/generate'
+
+
+def get_participant_emails(user_id):
+    token_headers = {
+      'content-type': 'application/x-www-form-urlencoded'
+    }
+
+    token_body = {
+      'username': '{{ .Values.hcx_admin_username }}',
+      'password': '{{ .Values.hcx_admin_password }}'
+    }
+
+    keycloak_response = requests.post(url=token_url, headers=token_headers, data=token_body)
+        
+    access_token = ''
+    if keycloak_response.status_code == 200:
+        response_data = keycloak_response.json()
+        access_token = f"Bearer {response_data.get('access_token')}" 
+    else:
+        print(f"Not able to generate keycloak token, status code: {keycloak_response.status_code}")
+        print(keycloak_response.text)
+    
+    headers = {
+      'Content-Type': 'application/json',
+      'Authorization': access_token
+    }
+
+    data = {
+      "filters": {
+            "user_id": {
+               "eq": user_id
+        }
+      } 
+    }
+
+    print("User Request Body: ", data)
+
+    response = requests.post(url=user_search_url, headers=headers, json=data)
+    if response.status_code == 200:
+        result = response.json()
+        print("User Search Results",result)  
+
+        participant_codes_list = []
+        users = result.get('users', [])
+        for user in users:
+            tenant_roles = user.get('tenant_roles', [])
+            codes = [tenant['participant_code'] for tenant in tenant_roles]
+            participant_codes_list.extend(codes)  # Append roles to the list
+
+        print("Participant Codes:", participant_codes_list)
+        return get_emails(participant_codes_list,headers)
+    else:
+        print(f"Request failed with status code: {response.status_code}")
+        print(response.text)
+
+def get_emails(participant_codes_list,headers):
+    participant_request_filters = {
+          "filters": {
+            "participant_code": {
+               "or": participant_codes_list
+          }
+       } 
+    }
+    
+    print("Participant request ", participant_request_filters)
+    participant_response = requests.post(url=participant_search_url, headers=headers, json=participant_request_filters)
+    print("participant status ",participant_response.status_code)
+    if participant_response.status_code == 200:
+        participant_result = participant_response.json()
+        participants = participant_result.get('participants', [])
+        primary_emails = [participant.get('primary_email', None) for participant in participants]
+        print("Participant emails ", primary_emails)
+        email_string = "','".join(primary_emails)
+        return email_string
+    else:
+        print(f"Participant Search Request failed with status code: {response.status_code}")
+        print(response.text)   
+
+
+JINJA_CONTEXT_ADDONS = {
+    "get_participant_emails": get_participant_emails
+}
+
 ENABLE_CORS = True
 CORS_OPTIONS = {
     'supports_credentials': True,
@@ -129,13 +219,13 @@ RESULTS_BACKEND = RedisCache(
       key_prefix='superset_results'
 )
 # OIDC config
-AUTH_TYPE = AUTH_OID
+#AUTH_TYPE = AUTH_OID
 OIDC_CLIENT_SECRETS = '/app/pythonpath/client_secret.json'
 OIDC_ID_TOKEN_COOKIE_SECURE = False
 OIDC_REQUIRE_VERIFIED_EMAIL = False
 OIDC_OPENID_REALM = env('OIDC_OPENID_REALM')
 # OIDC_INTROSPECTION_AUTH_METHOD = 'client_secret_post'
-CUSTOM_SECURITY_MANAGER = OIDCSecurityManager
+CUSTOM_SECURITY_MANAGER = CustomSecurityManager
 AUTH_USER_REGISTRATION = True
 AUTH_USER_REGISTRATION_ROLE = 'Gamma'
 APP_NAME = env('APP_NAME')
