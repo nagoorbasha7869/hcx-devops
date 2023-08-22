@@ -62,7 +62,6 @@ Create chart name and version as used by the chart label.
 
 {{- define "superset-config" }}
 from flask_appbuilder.security.manager import AUTH_OID
-from keycloak_security_manager import OIDCSecurityManager
 import os
 from cachelib.redis import RedisCache
 from my_security_manager import CustomSecurityManager
